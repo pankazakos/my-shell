@@ -9,7 +9,7 @@ all:
 	$(CXX) $(SRC)/mysh.cpp -o $(BIN)/mysh $(FLAGS)
 
 run: all
-	./$(BIN)
+	$(BIN)/mysh
 
 clean:
-	rm -f *.o mysh
+	rm -f $(BUILD)/*.o $(BIN)/mysh
