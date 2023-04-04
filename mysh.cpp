@@ -63,6 +63,8 @@ int main() {
 
         substring += ch;
       }
+    } else {
+      continue;
     }
 
     // // Execute commands
@@ -73,6 +75,9 @@ int main() {
     } else if (pid == 0) {
       // get command from list
       std::string command = args.front();
+      if (command.empty()) {
+        continue;
+      }
 
       // get path
       std::string path_env = std::getenv("PATH");
