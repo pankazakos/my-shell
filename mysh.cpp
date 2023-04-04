@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <list>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <vector>
 
 // @author Panagiotis Kazakos sdi1900067
@@ -62,6 +64,22 @@ int main() {
         substring += ch;
       }
     }
+
+    // // Execute commands
+    pid_t pid = fork();
+    if (pid < 0) {
+      std::cerr << "fork failed: ";
+      return 1;
+    } else if (pid == 0) {
+      std::string command = args.front();
+      execlp(("/bin/" + command).c_str(), command.c_str(), nullptr);
+      std::cerr << "Failed to execute " << command << std::endl;
+      return 1;
+    } else {
+      int status;
+      wait(&status);
+    }
+
     history[commands] = input;
     commands++;
     if (commands == 20) {

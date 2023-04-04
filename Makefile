@@ -2,9 +2,11 @@ CXX = g++
 FLAGS = -Wall -Wextra -g3
 NAME = mysh
 
+all: mysh.o
+	$(CXX) $(NAME).o -o $(NAME)
 
-all:
-	$(CXX) $(NAME).cpp -o $(NAME) $(FLAGS)
+mysh.o: mysh.cpp
+	$(CXX) $(NAME).cpp -c $(FLAGS)
 
 run: all
 	./$(NAME)
