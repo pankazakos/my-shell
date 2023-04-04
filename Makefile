@@ -1,15 +1,16 @@
 CXX = g++
 FLAGS = -Wall -Wextra -g3
-BIN = ./bin
-BUILD = ./build
-SRC = ./src
-INCLUDE = ./include
+NAME = mysh
+
 
 all:
-	$(CXX) $(SRC)/mysh.cpp -o $(BIN)/mysh $(FLAGS)
+	$(CXX) $(NAME).cpp -o $(NAME) $(FLAGS)
 
 run: all
-	$(BIN)/mysh
+	./$(NAME)
 
 clean:
-	rm -f $(BUILD)/*.o $(BIN)/mysh
+	rm -f *.o $(NAME)
+
+valgrind: all
+	valgrind $(NAME)
