@@ -1,9 +1,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <list>
+#include <sstream>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <vector>
 
 // @author Panagiotis Kazakos sdi1900067
 // My custom shell
@@ -71,7 +71,30 @@ int main() {
       std::cerr << "fork failed: ";
       return 1;
     } else if (pid == 0) {
+      // get command from list
       std::string command = args.front();
+
+      // get path
+      std::string path_env = std::getenv("PATH");
+      if (path_env.empty()) {
+        std::cout << "cannot get the PATH environment variable" << std::endl;
+        return 1;
+      }
+
+      // For each token in PATH env
+      std::stringstream ss(path_env);
+      std::string path;
+      while (std::getline(ss, path, ':')) {
+        // check if executable exists
+        std::string file = path + "/" + command;
+        if (access(file.c_str(), F_OK) == 0) {
+          // path found
+          break;
+        }
+        // clear path
+        path = "";
+      }
+      std::cout << "path: " << path << std::endl;
       execlp(("/bin/" + command).c_str(), command.c_str(), nullptr);
       std::cerr << "Failed to execute " << command << std::endl;
       return 1;
