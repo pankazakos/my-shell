@@ -95,7 +95,7 @@ int main() {
         path = "";
       }
       std::cout << "path: " << path << std::endl;
-      execlp(("/bin/" + command).c_str(), command.c_str(), nullptr);
+      execlp((path + "/" + command).c_str(), command.c_str(), nullptr);
       std::cerr << "Failed to execute " << command << std::endl;
       return 1;
     } else {
