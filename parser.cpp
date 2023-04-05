@@ -71,8 +71,15 @@ void Parser::history(std::list<std::string> &history) {
         const char *ch_number = str_number.c_str();
         index = atoi(ch_number) - 1;
       }
+      if (index < 0) {
+        std::cout << "Commands in history are listed from number 1 and above "
+                  << index << std::endl;
+      }
       if (index < (int)history.size()) {
         std::list<std::string>::iterator it = history.begin();
+        if (history.size() == 20) {
+          index--; // handle pop
+        }
         std::advance(it, index);
         std::cout << *it << std::endl;
       }
