@@ -5,7 +5,7 @@
 
 Parser::Parser(std::string &str) : str(str) {
   this->split(str, ' ', this->tokens);
-  for (int i = 0; i < this->tokens.size(); i++) {
+  for (std::size_t i = 0; i < this->tokens.size(); i++) {
     std::cout << "token: " << this->tokens[i] << std::endl;
   }
   this->num_tokens = this->tokens.size();
@@ -70,7 +70,7 @@ void Parser::split(const std::string &str, char delimiter,
     std::cout << "vector of substrings must be empty" << std::endl;
   }
   std::string curr_substr = "";
-  for (std::string::size_type i = 0; i < str.length(); i++) {
+  for (std::size_t i = 0; i < str.length(); i++) {
     char ch = str[i];
     if (ch != delimiter) {
       curr_substr += ch;
