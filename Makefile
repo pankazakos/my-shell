@@ -1,5 +1,5 @@
 CXX = g++
-FLAGS = -Wall -Wextra -g3
+FLAGS = -Wall -Wextra -g3 -std=c++11
 NAME = mysh
 OBJS = mysh.o parser.o
 

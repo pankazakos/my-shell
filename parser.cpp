@@ -1,46 +1,22 @@
 #include "parser.hpp"
 #include <iostream>
 #include <list>
+#include <vector>
 
 Parser::Parser(std::string &str) : str(str) {
-  int num_tokens = 0;
-  if (str.length() > 0) {
-    num_tokens++;
+  this->split(str, ' ', this->tokens);
+  for (int i = 0; i < this->tokens.size(); i++) {
+    std::cout << "token: " << this->tokens[i] << std::endl;
   }
-  for (std::string::size_type i = 0; i < str.length(); i++) {
-    char ch = str[i];
-    if (ch == ' ') {
-      num_tokens++;
-    }
-  }
-  this->num_tokens = num_tokens;
-  this->tokens = new std::string[num_tokens];
+  this->num_tokens = this->tokens.size();
 }
 
-Parser::~Parser() { delete[] this->tokens; }
+Parser::~Parser() {}
 
 const int &Parser::getNumTokens() const { return this->num_tokens; }
 
-const std::string *Parser::getTokens() const { return this->tokens; }
-
-void Parser::generateTokens() {
-  std::string token = ""; // each token
-
-  int counter_tokens = 0;
-  for (std::string::size_type i = 0; i < str.length(); i++) {
-    char ch = str[i];
-    if (ch != ' ') {
-      token += ch;
-    }
-    if (ch == ' ' || i == str.length() - 1) {
-      if (token.empty()) {
-        continue; // ignore whitespace
-      }
-      this->tokens[counter_tokens] = token;
-      counter_tokens++;
-      token = ""; // empty token
-    }
-  }
+const std::vector<std::string> &Parser::getTokens() const {
+  return this->tokens;
 }
 
 void Parser::history(std::list<std::string> &history) {
@@ -83,6 +59,25 @@ void Parser::history(std::list<std::string> &history) {
         std::advance(it, index);
         std::cout << *it << std::endl;
       }
+    }
+  }
+}
+
+void Parser::split(const std::string &str, char delimiter,
+                   std::vector<std::string> &substrings) {
+
+  if (!substrings.empty()) {
+    std::cout << "vector of substrings must be empty" << std::endl;
+  }
+  std::string curr_substr = "";
+  for (std::string::size_type i = 0; i < str.length(); i++) {
+    char ch = str[i];
+    if (ch != delimiter) {
+      curr_substr += ch;
+    }
+    if (ch == delimiter || i == str.length() - 1) {
+      substrings.push_back(curr_substr);
+      curr_substr = "";
     }
   }
 }

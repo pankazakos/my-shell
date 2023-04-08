@@ -4,6 +4,7 @@
 #include <list>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vector>
 
 // @author Panagiotis Kazakos sdi1900067
 // My custom shell
@@ -24,17 +25,9 @@ int main() {
     // Parse
     Parser parser(input);
 
+    const std::vector<std::string> tokens = parser.getTokens();
+
     const int num_tokens = parser.getNumTokens();
-
-    // std::cout << "number of tokens: " << num_tokens << std::endl;
-
-    parser.generateTokens();
-    const std::string *tokens = parser.getTokens();
-
-    // for (int i = 0; i < num_tokens; i++) {
-    //   std::cout << "token: " << tokens[i] << std::endl;
-    // }
-
     // new line handle
     if (num_tokens == 0) {
       continue;
