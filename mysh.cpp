@@ -45,6 +45,24 @@ int main() {
     }
     // history handle
     parser.history(history);
+
+    // Execute commands
+    pid_t pid = fork();
+    if (pid < 0) {
+      std::cerr << "fork failed: " << std::endl;
+      return 1;
+    } else if (pid == 0) {
+      // child
+      const char *command = tokens[0].c_str();
+      execlp(command, command, nullptr);
+      std::cerr << command << " is not a command" << std::endl;
+      return 1;
+    } else {
+      // parent
+      int status;
+      wait(&status);
+    }
+
     // char h_ch = tokens[0][0];
     // if (h_ch == 'h') {
     // }
