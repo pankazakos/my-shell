@@ -11,9 +11,7 @@
 // My custom shell
 
 int main() {
-
   std::list<std::string> history;
-
   while (true) {
     // Per line input logic
     // Prompt
@@ -26,7 +24,7 @@ int main() {
     // Parse
     Parser parser(input);
 
-    const std::vector<std::string> tokens = parser.getTokens();
+    const Command *tokens = parser.getTokens();
 
     const int num_tokens = parser.getNumTokens();
     // new line handle
@@ -34,34 +32,47 @@ int main() {
       continue;
     }
     // exit handle
-    if (tokens[0] == "exit") {
+    if (tokens[0].exec == "exit") {
       return 0;
     }
+
+    for (int i = 0; i < MAX_COMMANDS; i++) {
+      if (!tokens[i].empty) {
+        std::cout << "exec: " << tokens[i].exec << std::endl
+                  << "fileIn: " << tokens[i].fileIn << std::endl
+                  << "fileOut: " << tokens[i].fileOut << std::endl;
+        std::cout << "args: ";
+        for (std::size_t j = 0; j < tokens[i].args->size(); j++) {
+          std::cout << tokens[i].args->at(j) << " ";
+        }
+        std::cout << std::endl;
+      }
+    }
     // history handle
-    parser.history(history);
+    // parser.history(history);
 
     // Execute commands
-    pid_t pid = fork();
-    if (pid < 0) {
-      std::cerr << "fork failed: " << std::endl;
-      return 1;
-    } else if (pid == 0) {
-      // child
-      const char *command = tokens[0].c_str();
-      std::vector<std::string> args = {"ls", "-lag"};
-      std::vector<char *> argv;
-      for (auto &str : args) {
-        argv.push_back(&str[0]);
-      }
-      argv.push_back(nullptr);
-      execvp(command, argv.data());
-      std::cerr << command << " is not a command" << std::endl;
-      return 1;
-    } else {
-      // parent
-      int status;
-      wait(&status);
-    }
+    // pid_t pid = fork();
+    // if (pid < 0) {
+    //   std::cerr << "fork failed: " << std::endl;
+    //   return 1;
+    // } else if (pid == 0) {
+    //   // child
+    //   const char *command = tokens[0].c_str();
+    //   std::vector<std::string> args = {"ls", "-lag"};
+    //   std::vector<char *> argv;
+    //   for (auto &str : args) {
+    //     argv.push_back(&str[0]);
+    //   }
+    //   argv.push_back(nullptr);
+    //   execvp(command, argv.data());
+    //   std::cerr << command << " is not a command" << std::endl;
+    //   return 1;
+    // } else {
+    //   // parent
+    //   int status;
+    //   wait(&status);
+    // }
   }
 
   return 0;
