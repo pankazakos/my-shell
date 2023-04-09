@@ -48,7 +48,13 @@ int main() {
     } else if (pid == 0) {
       // child
       const char *command = tokens[0].c_str();
-      execlp(command, command, nullptr);
+      std::vector<std::string> args = {"ls", "-lag"};
+      std::vector<char *> argv;
+      for (auto &str : args) {
+        argv.push_back(&str[0]);
+      }
+      argv.push_back(nullptr);
+      execvp(command, argv.data());
       std::cerr << command << " is not a command" << std::endl;
       return 1;
     } else {

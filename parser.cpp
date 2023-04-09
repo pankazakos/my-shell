@@ -32,6 +32,7 @@ void Parser::history(std::list<std::string> &history) {
       std::cout << counter + 1 << ") " << line << std::endl;
       counter++;
     }
+    return;
   }
 
   int tok_length = this->tokens[0].length();
