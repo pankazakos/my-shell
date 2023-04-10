@@ -27,13 +27,22 @@ int main() {
     const Command *tokens = parser.getTokens();
 
     const int num_tokens = parser.getNumTokens();
+
     // new line handle
     if (num_tokens == 0) {
       continue;
     }
-    // exit handle
-    if (tokens[0].exec == "exit") {
-      return 0;
+
+    // handle keywords for all commands
+    for (int i = 0; i < MAX_COMMANDS; i++) {
+      if (tokens[i].empty)
+        continue;
+      // exit handle
+      if (tokens[i].exec == "exit") {
+        return 0;
+      }
+      // history handle
+      parser.history(history, i);
     }
 
     for (int i = 0; i < MAX_COMMANDS; i++) {
@@ -48,8 +57,6 @@ int main() {
         std::cout << std::endl;
       }
     }
-    // history handle
-    // parser.history(history);
 
     // Execute commands
     // pid_t pid = fork();

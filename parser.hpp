@@ -28,7 +28,7 @@ public:
   ~Parser();
   const int &getNumTokens() const;
   const Command *getTokens() const;
-  void history(std::list<std::string> &);
+  void history(std::list<std::string> &, int);
   static void split(const std::string &, char, std::vector<std::string> &);
 };
 
