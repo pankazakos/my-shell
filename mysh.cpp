@@ -36,10 +36,11 @@ int main() {
 
     // handle keywords for all commands
     for (int i = 0; i < MAX_COMMANDS; i++) {
-      if (tokens[i].empty)
+      const Command *command = &tokens[i]; // copy by reference
+      if (command->empty)
         continue;
       // exit handle
-      if (tokens[i].exec == "exit") {
+      if (command->exec == "exit") {
         return 0;
       }
       // history handle
@@ -61,7 +62,8 @@ int main() {
 
     // Execute commands
     for (int i = 0; i < MAX_COMMANDS; i++) {
-      if (tokens[i].empty)
+      const Command *command = &tokens[i]; // copy by reference
+      if (command->empty)
         break;
       pid_t pid = fork();
       if (pid < 0) {
@@ -70,22 +72,22 @@ int main() {
       } else if (pid == 0) {
         // child
         // command
-        const char *command = tokens[i].exec.c_str();
+        const char *exec_name = command->exec.c_str();
         // arguments
-        std::cout << "size: " << tokens[i].args->size() << std::endl;
+        std::cout << "size: " << command->args->size() << std::endl;
         std::vector<char *> argv;
-        for (auto &str : *tokens[i].args) {
+        for (auto &str : *command->args) {
           argv.push_back(&str[0]);
         }
         argv.push_back(nullptr);
         // redirections
-        int fdInput = open(tokens[i].fileIn.c_str(), O_RDONLY);
+        int fdInput = open(command->fileIn.c_str(), O_RDONLY);
         int fdOutput =
-            open(tokens[i].fileOut.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
+            open(command->fileOut.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
         dup2(fdInput, 0);
         dup2(fdOutput, 1);
-        execvp(command, argv.data());
-        std::cerr << command << " is not a command" << std::endl;
+        execvp(exec_name, argv.data());
+        std::cerr << exec_name << " is not a command" << std::endl;
         return 1;
       } else {
         // parent
