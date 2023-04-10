@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include <cstdlib>
+#include <fcntl.h>
 #include <iostream>
 #include <list>
 #include <string.h>
@@ -68,13 +69,21 @@ int main() {
         return 1;
       } else if (pid == 0) {
         // child
+        // command
         const char *command = tokens[i].exec.c_str();
+        // arguments
         std::cout << "size: " << tokens[i].args->size() << std::endl;
         std::vector<char *> argv;
         for (auto &str : *tokens[i].args) {
           argv.push_back(&str[0]);
         }
         argv.push_back(nullptr);
+        // redirections
+        int fdInput = open(tokens[i].fileIn.c_str(), O_RDONLY);
+        int fdOutput =
+            open(tokens[i].fileOut.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
+        dup2(fdInput, 0);
+        dup2(fdOutput, 1);
         execvp(command, argv.data());
         std::cerr << command << " is not a command" << std::endl;
         return 1;
