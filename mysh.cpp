@@ -59,26 +59,30 @@ int main() {
     }
 
     // Execute commands
-    pid_t pid = fork();
-    if (pid < 0) {
-      std::cerr << "fork failed: " << std::endl;
-      return 1;
-    } else if (pid == 0) {
-      // child
-      const char *command = tokens[0].exec.c_str();
-      std::cout << "size: " << tokens[0].args->size() << std::endl;
-      std::vector<char *> argv;
-      for (auto &str : *tokens[0].args) {
-        argv.push_back(&str[0]);
+    for (int i = 0; i < MAX_COMMANDS; i++) {
+      if (tokens[i].empty)
+        break;
+      pid_t pid = fork();
+      if (pid < 0) {
+        std::cerr << "fork failed: " << std::endl;
+        return 1;
+      } else if (pid == 0) {
+        // child
+        const char *command = tokens[i].exec.c_str();
+        std::cout << "size: " << tokens[i].args->size() << std::endl;
+        std::vector<char *> argv;
+        for (auto &str : *tokens[i].args) {
+          argv.push_back(&str[0]);
+        }
+        argv.push_back(nullptr);
+        execvp(command, argv.data());
+        std::cerr << command << " is not a command" << std::endl;
+        return 1;
+      } else {
+        // parent
+        int status;
+        wait(&status);
       }
-      argv.push_back(nullptr);
-      execvp(command, argv.data());
-      std::cerr << command << " is not a command" << std::endl;
-      return 1;
-    } else {
-      // parent
-      int status;
-      wait(&status);
     }
   }
 
