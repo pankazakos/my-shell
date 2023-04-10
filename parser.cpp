@@ -72,11 +72,6 @@ const Command *Parser::getTokens() const { return this->tokens; }
 
 void Parser::history(std::list<std::string> &history, int command_idx) {
 
-  if (history.size() == 20) {
-    history.pop_front();
-  }
-  history.push_back(this->str);
-
   std::string first_tok = this->tokens[command_idx].exec;
 
   if (first_tok == "h") {
@@ -85,6 +80,8 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
       std::cout << counter + 1 << ") " << line << std::endl;
       counter++;
     }
+    // make command empty since it is a keyword
+    this->tokens[command_idx].empty = true;
     return;
   }
 
@@ -112,6 +109,7 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
         }
         std::advance(it, index);
         std::cout << *it << std::endl;
+        this->tokens[command_idx].empty = true;
       }
     }
   }

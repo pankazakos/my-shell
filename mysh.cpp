@@ -34,6 +34,12 @@ int main() {
       continue;
     }
 
+    // add line to history
+    if (history.size() == 20) {
+      history.pop_front();
+    }
+    history.push_back(input);
+
     // handle keywords for all commands
     for (int i = 0; i < MAX_COMMANDS; i++) {
       const Command *command = &tokens[i]; // copy by reference
@@ -64,7 +70,7 @@ int main() {
     for (int i = 0; i < MAX_COMMANDS; i++) {
       const Command *command = &tokens[i]; // copy by reference
       if (command->empty)
-        break;
+        continue;
       pid_t pid = fork();
       if (pid < 0) {
         std::cerr << "fork failed: " << std::endl;
