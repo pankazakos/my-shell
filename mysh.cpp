@@ -59,27 +59,27 @@ int main() {
     }
 
     // Execute commands
-    // pid_t pid = fork();
-    // if (pid < 0) {
-    //   std::cerr << "fork failed: " << std::endl;
-    //   return 1;
-    // } else if (pid == 0) {
-    //   // child
-    //   const char *command = tokens[0].c_str();
-    //   std::vector<std::string> args = {"ls", "-lag"};
-    //   std::vector<char *> argv;
-    //   for (auto &str : args) {
-    //     argv.push_back(&str[0]);
-    //   }
-    //   argv.push_back(nullptr);
-    //   execvp(command, argv.data());
-    //   std::cerr << command << " is not a command" << std::endl;
-    //   return 1;
-    // } else {
-    //   // parent
-    //   int status;
-    //   wait(&status);
-    // }
+    pid_t pid = fork();
+    if (pid < 0) {
+      std::cerr << "fork failed: " << std::endl;
+      return 1;
+    } else if (pid == 0) {
+      // child
+      const char *command = tokens[0].exec.c_str();
+      std::cout << "size: " << tokens[0].args->size() << std::endl;
+      std::vector<char *> argv;
+      for (auto &str : *tokens[0].args) {
+        argv.push_back(&str[0]);
+      }
+      argv.push_back(nullptr);
+      execvp(command, argv.data());
+      std::cerr << command << " is not a command" << std::endl;
+      return 1;
+    } else {
+      // parent
+      int status;
+      wait(&status);
+    }
   }
 
   return 0;

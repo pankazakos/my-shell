@@ -33,6 +33,7 @@ Parser::Parser(std::string &str) : str(str) {
           // ingore whitespace
           if (!curr_substr.empty()) {
             this->tokens[command_counter].exec = curr_substr;
+            this->tokens[command_counter].args->push_back(curr_substr);
             this->tokens[command_counter].empty = false;
             token_counter++;
           }
