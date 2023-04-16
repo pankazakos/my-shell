@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <list>
+#include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -11,12 +12,37 @@
 // @author Panagiotis Kazakos sdi1900067
 // My custom shell
 
+static int ignore_sig = 1;
+static pid_t child_pid = -1;
+
+void signal_handler(int signal) {
+  if (ignore_sig) {
+    std::cout << "\nin-mysh-now:> ";
+    fflush(stdout);
+  } else {
+    kill(child_pid, signal);
+  }
+}
+
 int main() {
   std::list<std::string> history;
+
+  // register signal handler with sigaction
+  struct sigaction sa;
+  sa.sa_handler = &signal_handler;
+  sigemptyset(&sa.sa_mask);
+  sa.sa_flags = SA_RESTART;
+
+  if (sigaction(SIGINT, &sa, NULL) == -1) {
+    std::cerr << "signal handler not registered" << std::endl;
+    return 1;
+  }
+
   while (true) {
-    // Per line input logic
+    // Per line logic
     // Prompt
     std::cout << "in-mysh-now:> ";
+    fflush(stdout);
 
     // Input
     std::string input;
@@ -72,11 +98,14 @@ int main() {
       if (command->empty)
         continue;
       pid_t pid = fork();
+      ignore_sig = 0;
+      child_pid = pid;
       if (pid < 0) {
         std::cerr << "fork failed: " << std::endl;
         return 1;
       } else if (pid == 0) {
         // child
+
         // command
         const char *exec_name = command->exec.c_str();
         // arguments
@@ -86,7 +115,8 @@ int main() {
           argv.push_back(&str[0]);
         }
         argv.push_back(nullptr);
-        // redirections
+
+        // i/o redirection
         int fdInput = open(command->fileIn.c_str(), O_RDONLY);
         int fdOutput =
             open(command->fileOut.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
@@ -97,8 +127,10 @@ int main() {
         return 1;
       } else {
         // parent
+
         int status;
         wait(&status);
+        ignore_sig = 1;
       }
     }
   }
