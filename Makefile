@@ -12,11 +12,5 @@ mysh.o: mysh.cpp
 parser.o: parser.cpp parser.hpp
 	$(CXX) parser.cpp -c $(FLAGS)
 
-run: all
-	./$(NAME)
-
 clean:
 	rm -f *.o $(NAME)
-
-valgrind: all
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME)

@@ -21,6 +21,7 @@ void signal_handler(int signal) {
     fflush(stdout);
   } else {
     kill(child_pid, signal);
+    std::cout << std::endl;
   }
 }
 
@@ -34,6 +35,11 @@ int main() {
   sa.sa_flags = SA_RESTART;
 
   if (sigaction(SIGINT, &sa, NULL) == -1) {
+    std::cerr << "signal handler not registered" << std::endl;
+    return 1;
+  }
+
+  if (sigaction(SIGTSTP, &sa, NULL) == -1) {
     std::cerr << "signal handler not registered" << std::endl;
     return 1;
   }
@@ -129,7 +135,7 @@ int main() {
         // parent
 
         int status;
-        wait(&status);
+        waitpid(pid, &status, WUNTRACED);
         ignore_sig = 1;
       }
     }
