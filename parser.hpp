@@ -14,6 +14,7 @@ struct Command {
   std::vector<std::string> *args; // arguments of the program
   std::string fileIn;             // input file
   std::string fileOut;            // output file
+  std::string fileApnd;           // append to file
   bool empty; // false if command exists and is not a keyword
   Command() : empty(true) { this->args = new std::vector<std::string>; };
   ~Command() { delete args; };

@@ -89,7 +89,8 @@ int main() {
       if (!tokens[i].empty) {
         std::cout << "exec: " << tokens[i].exec << std::endl
                   << "fileIn: " << tokens[i].fileIn << std::endl
-                  << "fileOut: " << tokens[i].fileOut << std::endl;
+                  << "fileOut: " << tokens[i].fileOut << std::endl
+                  << "fileApnd: " << tokens[i].fileApnd << std::endl;
         std::cout << "args: ";
         for (std::size_t j = 0; j < tokens[i].args->size(); j++) {
           std::cout << tokens[i].args->at(j) << " ";
@@ -126,8 +127,11 @@ int main() {
         int fdInput = open(command->fileIn.c_str(), O_RDONLY);
         int fdOutput =
             open(command->fileOut.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
+        int fdApnd = open(command->fileApnd.c_str(),
+                          O_WRONLY | O_CREAT | O_APPEND, 0644);
         dup2(fdInput, 0);
         dup2(fdOutput, 1);
+        dup2(fdApnd, 1);
         execvp(exec_name, argv.data());
         std::cerr << exec_name << " is not a command" << std::endl;
         return 1;

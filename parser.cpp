@@ -12,6 +12,7 @@ Parser::Parser(std::string &str) : str(str) {
   for (std::size_t i = 0; i < str.length(); i++) {
 
     // for each command
+    int append = 0;
     std::string curr_substr = "";
     int token_counter = 0;
     char prev_delimiter = '0';
@@ -39,6 +40,10 @@ Parser::Parser(std::string &str) : str(str) {
           }
         } else if (prev_delimiter == '<') {
           this->tokens[command_counter].fileIn = curr_substr;
+        } else if (append) {
+          if (!curr_substr.empty()) {
+            this->tokens[command_counter].fileApnd = curr_substr;
+          }
         } else if (prev_delimiter == '>') {
           this->tokens[command_counter].fileOut = curr_substr;
         } else if (ch != '<' && ch != '>') {
@@ -49,6 +54,8 @@ Parser::Parser(std::string &str) : str(str) {
         if (str[i - 1] != '<' && str[i - 1] != '>' && str[i - 1] != '|' &&
             str[i - 1] != ';') {
           prev_delimiter = ch;
+        } else if (str[i - 1] == '>' && ch == '>') {
+          append = 1;
         }
         curr_substr = "";
       }
