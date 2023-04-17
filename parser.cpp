@@ -53,7 +53,7 @@ Parser::Parser(std::string &str) : str(str) {
           }
         } else if (prev_delimiter == '>') {
           this->tokens[command_counter].fileOut = curr_substr;
-        } else if (ch != '<' && ch != '>') {
+        } else {
           if (!curr_substr.empty()) {
             this->tokens[command_counter].args->push_back(curr_substr);
           }
