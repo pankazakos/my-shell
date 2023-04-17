@@ -12,7 +12,7 @@
 // @author Panagiotis Kazakos sdi1900067
 // My custom shell
 
-static int ignore_sig = 1;
+static bool ignore_sig = true;
 static pid_t child_pid = -1;
 
 void signal_handler(int signal) {
@@ -59,7 +59,9 @@ int main() {
 
     const Command *tokens = parser.getTokens();
 
-    const int num_tokens = parser.getNumTokens();
+    const int &num_tokens = parser.getNumTokens();
+    const int &num_commands = parser.getNumCommands();
+    const int &num_pipes = parser.getNumPipes();
 
     // new line handle
     if (num_tokens == 0) {
@@ -73,7 +75,7 @@ int main() {
     history.push_back(input);
 
     // handle keywords for all commands
-    for (int i = 0; i < MAX_COMMANDS; i++) {
+    for (int i = 0; i < num_commands; i++) {
       const Command *command = &tokens[i]; // copy by reference
       if (command->empty)
         continue;
@@ -85,12 +87,14 @@ int main() {
       parser.history(history, i);
     }
 
-    for (int i = 0; i < MAX_COMMANDS; i++) {
+    for (int i = 0; i < num_commands; i++) {
       if (!tokens[i].empty) {
         std::cout << "exec: " << tokens[i].exec << std::endl
                   << "fileIn: " << tokens[i].fileIn << std::endl
                   << "fileOut: " << tokens[i].fileOut << std::endl
-                  << "fileApnd: " << tokens[i].fileApnd << std::endl;
+                  << "fileApnd: " << tokens[i].fileApnd << std::endl
+                  << "pipeOut: " << tokens[i].pipeOut << std::endl
+                  << "pipeIn: " << tokens[i].pipeIn << std::endl;
         std::cout << "args: ";
         for (std::size_t j = 0; j < tokens[i].args->size(); j++) {
           std::cout << tokens[i].args->at(j) << " ";
@@ -99,13 +103,22 @@ int main() {
       }
     }
 
+    int pipe_fd[num_pipes][2];
+    for (int i = 0; i < num_pipes; i++) {
+      if (pipe(pipe_fd[i]) == -1) {
+        std::cerr << "Could not create pipe" << std::endl;
+      }
+    }
+
+    int pipe_counter = 0;
+
     // Execute commands
-    for (int i = 0; i < MAX_COMMANDS; i++) {
+    for (int i = 0; i < num_commands; i++) {
       const Command *command = &tokens[i]; // copy by reference
       if (command->empty)
         continue;
       pid_t pid = fork();
-      ignore_sig = 0;
+      ignore_sig = false;
       child_pid = pid;
       if (pid < 0) {
         std::cerr << "fork failed: " << std::endl;
@@ -116,7 +129,6 @@ int main() {
         // command
         const char *exec_name = command->exec.c_str();
         // arguments
-        std::cout << "size: " << command->args->size() << std::endl;
         std::vector<char *> argv;
         for (auto &str : *command->args) {
           argv.push_back(&str[0]);
@@ -132,16 +144,36 @@ int main() {
         dup2(fdInput, 0);
         dup2(fdOutput, 1);
         dup2(fdApnd, 1);
+        if (!command->fileOut.empty()) {
+          close(fdOutput);
+        }
+        if (!command->fileApnd.empty()) {
+          close(fdApnd);
+        }
+        if (command->pipeIn) {
+          dup2(pipe_fd[pipe_counter][0], 0);
+          close(pipe_fd[pipe_counter][0]);
+          close(pipe_fd[pipe_counter][1]);
+          pipe_counter++;
+        }
+        if (command->pipeOut) {
+          dup2(pipe_fd[pipe_counter][1], 1);
+          close(pipe_fd[pipe_counter][0]);
+          close(pipe_fd[pipe_counter][1]);
+        }
         execvp(exec_name, argv.data());
         std::cerr << exec_name << " is not a command" << std::endl;
         return 1;
-      } else {
-        // parent
-
-        int status;
-        waitpid(pid, &status, WUNTRACED);
-        ignore_sig = 1;
       }
+      // parent
+
+      if (command->pipeIn) {
+        close(pipe_fd[pipe_counter][0]);
+        close(pipe_fd[pipe_counter][1]);
+      }
+      int status;
+      waitpid(child_pid, &status, WUNTRACED);
+      ignore_sig = true;
     }
   }
 

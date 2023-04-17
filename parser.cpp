@@ -9,10 +9,14 @@ Parser::Parser(std::string &str) : str(str) {
   this->tokens = new Command[MAX_COMMANDS];
   int command_counter = 0;
 
+  bool next_pipeIn = false;
+  this->num_commands = 0;
+  this->num_pipes = 0;
+
   for (std::size_t i = 0; i < str.length(); i++) {
 
     // for each command
-    int append = 0;
+    bool append = false;
     std::string curr_substr = "";
     int token_counter = 0;
     char prev_delimiter = '0';
@@ -38,6 +42,9 @@ Parser::Parser(std::string &str) : str(str) {
             this->tokens[command_counter].empty = false;
             token_counter++;
           }
+          if (next_pipeIn) {
+            this->tokens[command_counter].pipeIn = true;
+          }
         } else if (prev_delimiter == '<') {
           this->tokens[command_counter].fileIn = curr_substr;
         } else if (append) {
@@ -55,13 +62,20 @@ Parser::Parser(std::string &str) : str(str) {
             str[i - 1] != ';') {
           prev_delimiter = ch;
         } else if (str[i - 1] == '>' && ch == '>') {
-          append = 1;
+          append = true;
         }
         curr_substr = "";
       }
       // end of the command
       if (ch == '|' || ch == ';' || i == str.length() - 1) {
         prev_delimiter = ch;
+        next_pipeIn = false;
+        this->num_commands++;
+        if (ch == '|') {
+          next_pipeIn = true;
+          this->num_pipes++;
+          this->tokens[command_counter].pipeOut = true;
+        }
         break;
       }
       i++;
@@ -74,6 +88,10 @@ Parser::Parser(std::string &str) : str(str) {
 Parser::~Parser() { delete[] this->tokens; }
 
 const int &Parser::getNumTokens() const { return this->num_tokens; }
+
+const int &Parser::getNumCommands() const { return this->num_commands; }
+
+const int &Parser::getNumPipes() const { return this->num_pipes; }
 
 const Command *Parser::getTokens() const { return this->tokens; }
 
