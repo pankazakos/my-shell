@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <vector>
 
+// #define DEBUG_MODE 1 // comment out to disable Debug mode
+
 // @author Panagiotis Kazakos sdi1900067
 // My custom shell
 
@@ -87,6 +89,7 @@ int main() {
       parser.history(history, i);
     }
 
+#ifdef DEBUG_MODE
     for (int i = 0; i < num_commands; i++) {
       if (!tokens[i].empty) {
         std::cout << "exec: " << tokens[i].exec << std::endl
@@ -102,6 +105,7 @@ int main() {
         std::cout << std::endl;
       }
     }
+#endif
 
     int pipe_fd[num_pipes][2];
     for (int i = 0; i < num_pipes; i++) {
