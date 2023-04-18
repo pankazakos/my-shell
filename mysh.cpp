@@ -97,7 +97,8 @@ int main() {
                   << "fileOut: " << tokens[i].fileOut << std::endl
                   << "fileApnd: " << tokens[i].fileApnd << std::endl
                   << "pipeOut: " << tokens[i].pipeOut << std::endl
-                  << "pipeIn: " << tokens[i].pipeIn << std::endl;
+                  << "pipeIn: " << tokens[i].pipeIn << std::endl
+                  << "background: " << tokens[i].background << std::endl;
         std::cout << "args: ";
         for (std::size_t j = 0; j < tokens[i].args->size(); j++) {
           std::cout << tokens[i].args->at(j) << " ";
@@ -175,8 +176,13 @@ int main() {
         close(pipe_fd[pipe_counter][0]);
         close(pipe_fd[pipe_counter][1]);
       }
-      int status;
-      waitpid(child_pid, &status, WUNTRACED);
+      if (command->background) {
+        int status;
+        waitpid(child_pid, &status, WNOWAIT);
+      } else {
+        int status;
+        waitpid(child_pid, &status, WUNTRACED);
+      }
       ignore_sig = true;
     }
   }

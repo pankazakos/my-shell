@@ -17,8 +17,9 @@ struct Command {
   std::string fileApnd;           // append to file
   bool pipeOut;                   // redirect stdout to pipe write
   bool pipeIn;                    // redirect stdin to pipe read
+  bool background;                // command should run in background
   bool empty; // false if command exists and is not a keyword
-  Command() : pipeOut(false), pipeIn(false), empty(true) {
+  Command() : pipeOut(false), pipeIn(false), background(false), empty(true) {
     this->args = new std::vector<std::string>;
   };
   ~Command() { delete args; };

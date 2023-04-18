@@ -29,11 +29,17 @@ Parser::Parser(std::string &str) : str(str) {
         i++;
         continue;
       }
-      if (ch != ' ' && ch != '<' && ch != '>' && ch != '|' && ch != ';') {
+      if (ch != ' ' && ch != '<' && ch != '>' && ch != '|' && ch != ';' &&
+          ch != '&') {
         curr_substr += ch;
       }
+
       if (ch == ' ' || ch == '<' || ch == '>' || i == str.length() - 1 ||
-          ch == '|' || ch == ';') {
+          ch == '|' || ch == ';' || ch == '&') {
+
+        if (ch == '&') {
+          this->tokens[command_counter].background = true;
+        }
         if (token_counter == 0) {
           // ingore whitespace
           if (!curr_substr.empty()) {
