@@ -153,8 +153,15 @@ void Parser::alias(std::map<std::string, std::string> &aliases,
   std::string first_tok = this->tokens[command_idx].exec;
 
   if (first_tok != "createalias" && first_tok != "destroyalias") {
-    return; // nothing to do
+    std::string value = aliases[first_tok];
+    if (!value.empty()) {
+      // if alias exists then replace the name of alias with its value
+      this->tokens[command_idx].exec = value;
+    }
+    return;
   }
+
+  // Keywords (createalias and destroyalias)
   // mark command as empty since it is a keyword
   this->tokens[command_idx].empty = true;
 
