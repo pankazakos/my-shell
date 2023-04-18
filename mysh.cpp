@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <list>
+#include <map>
 #include <signal.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -29,6 +30,7 @@ void signal_handler(int signal) {
 
 int main() {
   std::list<std::string> history;
+  std::map<std::string, std::string> aliases;
 
   // register signal handler with sigaction
   struct sigaction sa;
@@ -87,6 +89,8 @@ int main() {
       }
       // history handle
       parser.history(history, i);
+      // createalias and destroyalias
+      parser.alias(aliases, i);
     }
 
 #ifdef DEBUG_MODE
@@ -105,6 +109,10 @@ int main() {
         }
         std::cout << std::endl;
       }
+    }
+
+    for (const auto &pair : aliases) {
+      std::cout << pair.first << ": " << pair.second << std::endl;
     }
 #endif
 

@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include <iostream>
 #include <list>
+#include <map>
 #include <vector>
 
 Parser::Parser(std::string &str) : str(str) {
@@ -142,6 +143,32 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
         std::cout << *it << std::endl;
         this->tokens[command_idx].empty = true;
       }
+    }
+  }
+}
+
+void Parser::alias(std::map<std::string, std::string> &aliases,
+                   int command_idx) {
+
+  std::string first_tok = this->tokens[command_idx].exec;
+
+  if (first_tok != "createalias" && first_tok != "destroyalias") {
+    return; // nothing to do
+  }
+  // mark command as empty since it is a keyword
+  this->tokens[command_idx].empty = true;
+
+  std::vector<std::string> *args = this->tokens[command_idx].args;
+  if (first_tok == "createalias") {
+    if (args->size() >= 3) {
+      // ignore first argument "createalias"
+      aliases[args->at(1)] = args->at(2);
+    }
+  } else {
+    // destroyalias keyword
+    if (args->size() >= 2) {
+      // ignore first argument "destorylias"
+      aliases.erase(args->at(1));
     }
   }
 }

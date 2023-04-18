@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <list>
+#include <map>
 #include <vector>
 
 #define MAX_COMMANDS 4
@@ -50,6 +51,11 @@ public:
   // h prints whole history
   // h-i prints line of history with number i
   void history(std::list<std::string> &, int);
+
+  // handle createalias and destroy alias keywords
+  // createalias name value : creates an alias for value with name
+  // destroyalias name : destroys the alias with name
+  void alias(std::map<std::string, std::string> &, int);
 
   // splits a string to a vector (initially passed as empty) of tokens with one
   // char delimiter
