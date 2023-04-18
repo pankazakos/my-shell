@@ -147,16 +147,20 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
   }
 }
 
-void Parser::alias(std::map<std::string, std::string> &aliases,
+void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
                    int command_idx) {
 
   std::string first_tok = this->tokens[command_idx].exec;
 
   if (first_tok != "createalias" && first_tok != "destroyalias") {
-    std::string value = aliases[first_tok];
+    std::vector<std::string> value = aliases[first_tok];
     if (!value.empty()) {
       // if alias exists then replace the name of alias with its value
-      this->tokens[command_idx].exec = value;
+      this->tokens[command_idx].exec = value.at(0);
+      // add the rest of the arguments
+      for (std::size_t i = 1; i < value.size(); i++) {
+        this->tokens[command_idx].args->push_back(value.at(i));
+      }
     }
     return;
   }
@@ -166,16 +170,22 @@ void Parser::alias(std::map<std::string, std::string> &aliases,
   this->tokens[command_idx].empty = true;
 
   std::vector<std::string> *args = this->tokens[command_idx].args;
+  std::string key = args->at(1);
   if (first_tok == "createalias") {
     if (args->size() >= 3) {
       // ignore first argument "createalias"
-      aliases[args->at(1)] = args->at(2);
+      // insert all arguments to map except starting after the second one which
+      // is used as key
+      std::vector<std::string> al_args(std::next(args->begin(), 2),
+                                       args->end());
+      aliases[key] = al_args;
     }
   } else {
     // destroyalias keyword
     if (args->size() >= 2) {
       // ignore first argument "destorylias"
-      aliases.erase(args->at(1));
+      // delete from map
+      aliases.erase(key);
     }
   }
 }

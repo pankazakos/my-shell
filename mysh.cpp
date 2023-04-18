@@ -30,7 +30,7 @@ void signal_handler(int signal) {
 
 int main() {
   std::list<std::string> history;
-  std::map<std::string, std::string> aliases;
+  std::map<std::string, std::vector<std::string>> aliases;
 
   // register signal handler with sigaction
   struct sigaction sa;

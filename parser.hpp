@@ -55,7 +55,7 @@ public:
   // handle createalias and destroy alias keywords
   // createalias name value : creates an alias for value with name
   // destroyalias name : destroys the alias with name
-  void alias(std::map<std::string, std::string> &, int);
+  void alias(std::map<std::string, std::vector<std::string>> &, int);
 
   // splits a string to a vector (initially passed as empty) of tokens with one
   // char delimiter
