@@ -2,6 +2,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <unistd.h>
 #include <vector>
 
 Parser::Parser(std::string &str) : str(str) {
@@ -31,12 +32,12 @@ Parser::Parser(std::string &str) : str(str) {
         continue;
       }
       if (ch != ' ' && ch != '<' && ch != '>' && ch != '|' && ch != ';' &&
-          ch != '&') {
+          ch != '&' && ch != '$') {
         curr_substr += ch;
       }
 
       if (ch == ' ' || ch == '<' || ch == '>' || i == str.length() - 1 ||
-          ch == '|' || ch == ';' || ch == '&') {
+          ch == '|' || ch == ';' || ch == '&' || ch == '$') {
 
         if (ch == '&') {
           this->tokens[command_counter].background = true;
@@ -60,6 +61,11 @@ Parser::Parser(std::string &str) : str(str) {
           }
         } else if (prev_delimiter == '>') {
           this->tokens[command_counter].fileOut = curr_substr;
+        } else if (prev_delimiter == '$') {
+          char *env = getenv(curr_substr.c_str());
+          if (env != NULL) {
+            this->tokens[command_counter].args->push_back(std::string(env));
+          }
         } else {
           if (!curr_substr.empty()) {
             this->tokens[command_counter].args->push_back(curr_substr);
