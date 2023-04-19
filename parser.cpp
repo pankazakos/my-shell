@@ -32,7 +32,7 @@ Parser::Parser(std::string &str) : str(str) {
         continue;
       }
       if (ch != ' ' && ch != '<' && ch != '>' && ch != '|' && ch != ';' &&
-          ch != '&' && ch != '$') {
+          ch != '&' && ch != '$' && ch != '"') {
         curr_substr += ch;
       }
 
