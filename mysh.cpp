@@ -10,8 +10,6 @@
 #include <unistd.h>
 #include <vector>
 
-// #define DEBUG_MODE 1 // comment out to disable Debug mode
-
 // @author Panagiotis Kazakos sdi1900067
 // My custom shell
 
@@ -92,29 +90,6 @@ int main() {
       // createalias and destroyalias
       parser.alias(aliases, i);
     }
-
-#ifdef DEBUG_MODE
-    for (int i = 0; i < num_commands; i++) {
-      if (!tokens[i].empty) {
-        std::cout << "exec: " << tokens[i].exec << std::endl
-                  << "fileIn: " << tokens[i].fileIn << std::endl
-                  << "fileOut: " << tokens[i].fileOut << std::endl
-                  << "fileApnd: " << tokens[i].fileApnd << std::endl
-                  << "pipeOut: " << tokens[i].pipeOut << std::endl
-                  << "pipeIn: " << tokens[i].pipeIn << std::endl
-                  << "background: " << tokens[i].background << std::endl;
-        std::cout << "args: ";
-        for (std::size_t j = 0; j < tokens[i].args->size(); j++) {
-          std::cout << tokens[i].args->at(j) << " ";
-        }
-        std::cout << std::endl;
-      }
-    }
-
-    for (const auto &pair : aliases) {
-      std::cout << pair.first << ": " << pair.second << std::endl;
-    }
-#endif
 
     int pipe_fd[num_pipes][2];
     for (int i = 0; i < num_pipes; i++) {

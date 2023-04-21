@@ -195,22 +195,3 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
     }
   }
 }
-
-void Parser::split(const std::string &str, char delimiter,
-                   std::vector<std::string> &substrings) {
-
-  if (!substrings.empty()) {
-    std::cout << "vector of substrings must be empty" << std::endl;
-  }
-  std::string curr_substr = "";
-  for (std::size_t i = 0; i < str.length(); i++) {
-    char ch = str[i];
-    if (ch != delimiter) {
-      curr_substr += ch;
-    }
-    if (ch == delimiter || i == str.length() - 1) {
-      substrings.push_back(curr_substr);
-      curr_substr = "";
-    }
-  }
-}
