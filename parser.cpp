@@ -176,6 +176,8 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
   this->tokens[command_idx].empty = true;
 
   std::vector<std::string> *args = this->tokens[command_idx].args;
+  if (args->size() < 2)
+    return;
   std::string key = args->at(1);
   if (first_tok == "createalias") {
     if (args->size() >= 3) {
