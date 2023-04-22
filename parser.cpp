@@ -17,11 +17,11 @@ Parser::Parser(std::string &str) : str(str) {
 
   for (std::size_t i = 0; i < str.length(); i++) {
 
-    // for each command
-    bool append = false;
+    // For each command
+    bool append = false; // bool if there is file to append
     std::string curr_substr = "";
     int token_counter = 0;
-    char prev_delimiter = '0';
+    char prev_delimiter = '0'; // for identifying a token from the left
     while (true) {
       char ch = str[i];
       if ((int)i > 0 && str[i - 1] == ' ' && ch == ' ') {
@@ -31,11 +31,14 @@ Parser::Parser(std::string &str) : str(str) {
         i++;
         continue;
       }
+      // Do not append any of these characters to a token
       if (ch != ' ' && ch != '<' && ch != '>' && ch != '|' && ch != ';' &&
           ch != '&' && ch != '$' && ch != '"') {
         curr_substr += ch;
       }
 
+      // found a token before any of these characters or if it is the end of the
+      // string
       if (ch == ' ' || ch == '<' || ch == '>' || i == str.length() - 1 ||
           ch == '|' || ch == ';' || ch == '&' || ch == '$') {
 

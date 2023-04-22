@@ -116,7 +116,7 @@ int main() {
 
         // command
         const char *exec_name = command->exec.c_str();
-        // arguments
+        // convert all arguments from std::string to char *
         std::vector<char *> argv;
         for (auto &str : *command->args) {
           argv.push_back(&str[0]);

@@ -43,8 +43,8 @@ public:
   const int &getNumCommands() const;
   const int &getNumPipes() const;
 
-  // Tokens MAX_COMMANDS * n array where n is the number of tokens of each
-  // command
+  // Array of MAX_COMMANDS * n dimensions where n is the number of tokens of
+  // each command
   const Command *getTokens() const;
 
   // prints history when corresponding keyword is given
@@ -52,9 +52,10 @@ public:
   // h-i prints line of history with number i
   void history(std::list<std::string> &, int);
 
-  // handle createalias and destroy alias keywords
+  // handle createalias and destroyalias keywords
   // createalias name value : creates an alias for value with name
   // destroyalias name : destroys the alias with name
+  // also replaces the command with the value of the alias if exists
   void alias(std::map<std::string, std::vector<std::string>> &, int);
 };
 
