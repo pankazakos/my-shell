@@ -1,16 +1,16 @@
 CXX = g++
 FLAGS = -Wall -Wextra -g3 -std=c++11
-NAME = mysh
+EXEC = mysh
 OBJS = mysh.o parser.o
 
-all: mysh.o parser.o
-	$(CXX) $(OBJS) -o $(NAME)
+$(EXEC): $(OBJS)
+	$(CXX) $(OBJS) -o $(EXEC)
 
 mysh.o: mysh.cpp
-	$(CXX) $(NAME).cpp -c $(FLAGS)
+	$(CXX) mysh.cpp -c $(FLAGS)
 
 parser.o: parser.cpp parser.hpp
 	$(CXX) parser.cpp -c $(FLAGS)
 
 clean:
-	rm -f *.o $(NAME)
+	rm -f *.o $(EXEC)
