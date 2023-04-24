@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include <iostream>
+#include <limits.h>
 #include <list>
 #include <map>
 #include <unistd.h>
@@ -199,4 +200,35 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
       aliases.erase(key);
     }
   }
+}
+
+void Parser::cd(int command_idx) {
+
+  std::string first_tok = this->tokens[command_idx].exec;
+
+  if (first_tok != "cd") {
+    return; // nothing to do
+  }
+
+  // keyword is not a command
+  this->tokens[command_idx].empty = true;
+
+  // change to default HOME path if there are no arguments specified after the
+  // default argument
+  if (this->tokens[command_idx].args->size() < 2) {
+    char *home = getenv("HOME");
+    chdir(home);
+    return;
+  }
+
+  // get current working directory
+  char cwd[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+    std::cerr << "getcwd() error" << std::endl;
+    return;
+  }
+
+  // change to new directory
+  std::string dir = this->tokens[command_idx].args->at(1);
+  chdir(dir.c_str());
 }

@@ -89,6 +89,8 @@ int main() {
       parser.history(history, i);
       // createalias and destroyalias
       parser.alias(aliases, i);
+      // handle cd keyword
+      parser.cd(i);
     }
 
     int pipe_fd[num_pipes][2];

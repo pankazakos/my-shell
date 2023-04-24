@@ -57,6 +57,9 @@ public:
   // destroyalias name : destroys the alias with name
   // also replaces the command with the value of the alias if exists
   void alias(std::map<std::string, std::vector<std::string>> &, int);
+
+  // handle cd keyword
+  void cd(int);
 };
 
 #endif
