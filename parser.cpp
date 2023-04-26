@@ -146,15 +146,22 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
   }
 
   if (line_idx < (int)history.size()) {
-    std::list<std::string>::iterator line = history.begin();
+    std::list<std::string>::iterator it = history.begin();
     if (history.size() == 20) {
       line_idx--; // handle pop
     }
-    std::advance(line, line_idx); // access line with line_idx
-    std::cout << *line << std::endl;
-    // Replace myHistory i with the matching commands
+    std::advance(it, line_idx); // access line with line_idx
+    std::string line = *it;
+    std::cout << line << std::endl;
+
+    // Replace myHistory i in history with the matching commands
     history.pop_back();
-    history.push_back(*line);
+    history.push_back(line);
+
+    // Replace actual command
+    Parser temp_parser(line);
+    const Command *temp_tokens = temp_parser.getTokens();
+    *command = temp_tokens[0]; // deep copy with custom copy constructor
   }
 }
 

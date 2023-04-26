@@ -23,6 +23,26 @@ struct Command {
   Command() : pipeOut(false), pipeIn(false), background(false), empty(true) {
     this->args = new std::vector<std::string>;
   };
+  Command(const Command &cmd)
+      : exec(cmd.exec), args(new std::vector<std::string>(*cmd.args)),
+        fileIn(cmd.fileIn), fileOut(cmd.fileOut), fileApnd(cmd.fileApnd),
+        pipeOut(cmd.pipeOut), pipeIn(cmd.pipeIn), background(cmd.background),
+        empty(cmd.empty) {}
+  Command &operator=(const Command &cmd) {
+    if (this != &cmd) {
+      exec = cmd.exec;
+      fileIn = cmd.fileIn;
+      fileOut = cmd.fileOut;
+      fileApnd = cmd.fileApnd;
+      pipeOut = cmd.pipeOut;
+      pipeIn = cmd.pipeIn;
+      background = cmd.background;
+      empty = cmd.empty;
+      delete args;
+      args = new std::vector<std::string>(*cmd.args);
+    }
+    return *this;
+  }
   ~Command() { delete args; };
 };
 
