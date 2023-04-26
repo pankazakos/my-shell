@@ -134,6 +134,9 @@ int main() {
         dup2(fdInput, 0);
         dup2(fdOutput, 1);
         dup2(fdApnd, 1);
+        if (!command->fileIn.empty()) {
+          close(fdInput);
+        }
         if (!command->fileOut.empty()) {
           close(fdOutput);
         }
