@@ -18,6 +18,7 @@ Parser::Parser(std::string &str) : str(str) {
 
   for (std::size_t i = 0; i < str.length(); i++) {
 
+    Command *command = &this->tokens[command_counter];
     // For each command
     bool append = false; // bool if there is file to append
     std::string curr_substr = "";
@@ -44,35 +45,35 @@ Parser::Parser(std::string &str) : str(str) {
           ch == '|' || ch == ';' || ch == '&' || ch == '$') {
 
         if (ch == '&') {
-          this->tokens[command_counter].background = true;
+          command->background = true;
         }
         if (token_counter == 0) {
           // ingore whitespace
           if (!curr_substr.empty()) {
-            this->tokens[command_counter].exec = curr_substr;
-            this->tokens[command_counter].args->push_back(curr_substr);
-            this->tokens[command_counter].empty = false;
+            command->exec = curr_substr;
+            command->args->push_back(curr_substr);
+            command->empty = false;
             token_counter++;
           }
           if (next_pipeIn) {
-            this->tokens[command_counter].pipeIn = true;
+            command->pipeIn = true;
           }
         } else if (prev_delimiter == '<') {
-          this->tokens[command_counter].fileIn = curr_substr;
+          command->fileIn = curr_substr;
         } else if (append) {
           if (!curr_substr.empty()) {
-            this->tokens[command_counter].fileApnd = curr_substr;
+            command->fileApnd = curr_substr;
           }
         } else if (prev_delimiter == '>') {
-          this->tokens[command_counter].fileOut = curr_substr;
+          command->fileOut = curr_substr;
         } else if (prev_delimiter == '$') {
           char *env = getenv(curr_substr.c_str());
           if (env != NULL) {
-            this->tokens[command_counter].args->push_back(std::string(env));
+            command->args->push_back(std::string(env));
           }
         } else {
           if (!curr_substr.empty()) {
-            this->tokens[command_counter].args->push_back(curr_substr);
+            command->args->push_back(curr_substr);
           }
         }
         if (str[i - 1] != '<' && str[i - 1] != '>' && str[i - 1] != '|' &&
@@ -91,7 +92,7 @@ Parser::Parser(std::string &str) : str(str) {
         if (ch == '|') {
           next_pipeIn = true;
           this->num_pipes++;
-          this->tokens[command_counter].pipeOut = true;
+          command->pipeOut = true;
         }
         break;
       }
@@ -160,16 +161,18 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
 void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
                    int command_idx) {
 
-  std::string first_tok = this->tokens[command_idx].exec;
+  Command *command = &this->tokens[command_idx];
+
+  std::string first_tok = command->exec;
 
   if (first_tok != "createalias" && first_tok != "destroyalias") {
     std::vector<std::string> value = aliases[first_tok];
     if (!value.empty()) {
       // if alias exists then replace the name of alias with its value
-      this->tokens[command_idx].exec = value.at(0);
+      command->exec = value.at(0);
       // add the rest of the arguments
       for (std::size_t i = 1; i < value.size(); i++) {
-        this->tokens[command_idx].args->push_back(value.at(i));
+        command->args->push_back(value.at(i));
       }
     }
     return;
@@ -177,9 +180,9 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
 
   // Keywords (createalias and destroyalias)
   // mark command as empty since it is a keyword
-  this->tokens[command_idx].empty = true;
+  command->empty = true;
 
-  std::vector<std::string> *args = this->tokens[command_idx].args;
+  std::vector<std::string> *args = command->args;
   if (args->size() < 2)
     return;
   std::string key = args->at(1);
@@ -204,18 +207,20 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
 
 void Parser::cd(int command_idx) {
 
-  std::string first_tok = this->tokens[command_idx].exec;
+  Command *command = &this->tokens[command_idx];
+
+  std::string first_tok = command->exec;
 
   if (first_tok != "cd") {
     return; // nothing to do
   }
 
   // keyword is not a command
-  this->tokens[command_idx].empty = true;
+  command->empty = true;
 
   // change to default HOME path if there are no arguments specified after the
   // default argument
-  if (this->tokens[command_idx].args->size() < 2) {
+  if (command->args->size() < 2) {
     char *home = getenv("HOME");
     chdir(home);
     return;
@@ -229,6 +234,6 @@ void Parser::cd(int command_idx) {
   }
 
   // change to new directory
-  std::string dir = this->tokens[command_idx].args->at(1);
+  std::string dir = command->args->at(1);
   chdir(dir.c_str());
 }
