@@ -114,46 +114,46 @@ const Command *Parser::getTokens() const { return this->tokens; }
 
 void Parser::history(std::list<std::string> &history, int command_idx) {
 
-  std::string first_tok = this->tokens[command_idx].exec;
+  Command *command = &this->tokens[command_idx];
 
-  if (first_tok == "h") {
+  std::string first_tok = command->exec;
+
+  if (first_tok != "myHistory") {
+    return; // nothing to do
+  }
+
+  // make command empty since it is a keyword
+  command->empty = true;
+
+  if (command->args->size() == 1) {
     int counter = 0;
     for (const auto &line : history) {
       std::cout << counter + 1 << ") " << line << std::endl;
       counter++;
     }
-    // make command empty since it is a keyword
-    this->tokens[command_idx].empty = true;
     return;
   }
 
-  int tok_length = first_tok.length();
-  if (tok_length == 3 || tok_length == 4) {
-    if (first_tok[0] == 'h' && first_tok[1] == '-') {
-      int index = 0;
-      if (tok_length == 3) {
-        index = (first_tok[2] - '0') - 1;
-      } else {
-        std::string str_number = "";
-        str_number += first_tok[2];
-        str_number += first_tok[3];
-        const char *ch_number = str_number.c_str();
-        index = atoi(ch_number) - 1;
-      }
-      if (index < 0) {
-        std::cout << "Commands in history are listed from number 1 and above "
-                  << index << std::endl;
-      }
-      if (index < (int)history.size()) {
-        std::list<std::string>::iterator it = history.begin();
-        if (history.size() == 20) {
-          index--; // handle pop
-        }
-        std::advance(it, index);
-        std::cout << *it << std::endl;
-        this->tokens[command_idx].empty = true;
-      }
+  // args >= 2 (arguments after the second are ignored)
+
+  int line_idx = atoi(command->args->at(1).c_str()) - 1;
+
+  if (line_idx < 0) {
+    std::cout << "Commands in history are listed from number 1 and above "
+              << std::endl;
+    return;
+  }
+
+  if (line_idx < (int)history.size()) {
+    std::list<std::string>::iterator line = history.begin();
+    if (history.size() == 20) {
+      line_idx--; // handle pop
     }
+    std::advance(line, line_idx); // access line with line_idx
+    std::cout << *line << std::endl;
+    // Replace myHistory i with the matching commands
+    history.pop_back();
+    history.push_back(*line);
   }
 }
 
