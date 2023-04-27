@@ -20,14 +20,19 @@ struct Command {
   bool pipeIn;                    // redirect stdin to pipe read
   bool background;                // command should run in background
   bool empty; // false if command exists and is not a keyword
-  Command() : pipeOut(false), pipeIn(false), background(false), empty(true) {
-    this->args = new std::vector<std::string>;
-  };
+
+  Command()
+      : args(new std::vector<std::string>), pipeOut(false), pipeIn(false),
+        background(false), empty(true){};
+
+  ~Command() { delete args; };
+
   Command(const Command &cmd)
       : exec(cmd.exec), args(new std::vector<std::string>(*cmd.args)),
         fileIn(cmd.fileIn), fileOut(cmd.fileOut), fileApnd(cmd.fileApnd),
         pipeOut(cmd.pipeOut), pipeIn(cmd.pipeIn), background(cmd.background),
-        empty(cmd.empty) {}
+        empty(cmd.empty){};
+
   Command &operator=(const Command &cmd) {
     if (this != &cmd) {
       exec = cmd.exec;
@@ -42,30 +47,23 @@ struct Command {
       args = new std::vector<std::string>(*cmd.args);
     }
     return *this;
-  }
-  ~Command() { delete args; };
+  };
 };
 
 class Parser {
-private:
-  int num_tokens;   // number of total tokens
-  int num_commands; // number of commands
-  int num_pipes;    // number of pipes
-  std::string str;  // whole input from the shell prompt
-  Command *tokens;  // tokens of all commands in one line of the shell prompt
-
 public:
   // Parses mysh input
   Parser(std::string &);
   ~Parser();
 
-  const int &getNumTokens() const;
-  const int &getNumCommands() const;
-  const int &getNumPipes() const;
+  const std::string &getStatus() const { return status; };
+  const int &getNumTokens() const { return num_tokens; };
+  const int &getNumCommands() const { return num_commands; };
+  const int &getNumPipes() const { return num_pipes; };
 
   // Array of MAX_COMMANDS * n dimensions where n is the number of tokens of
   // each command
-  const Command *const &getTokens() const;
+  const Command *const &getTokens() const { return tokens; };
 
   // prints history when corresponding keyword is given
   // h prints whole history
@@ -80,6 +78,14 @@ public:
 
   // handle cd keyword
   void cd(int);
+
+private:
+  std::string str;    // whole input from the shell prompt
+  std::string status; // OK for success
+  int num_tokens;     // number of total tokens
+  int num_commands;   // number of commands
+  int num_pipes;      // number of pipes
+  Command *tokens;    // tokens of all commands in one line of the shell prompt
 };
 
 #endif

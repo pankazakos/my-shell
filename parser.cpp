@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <vector>
 
-Parser::Parser(std::string &str) : str(str) {
+Parser::Parser(std::string &str) : str(str), status("OK") {
 
   this->num_tokens = 0;
   this->tokens = new Command[MAX_COMMANDS];
@@ -17,6 +17,11 @@ Parser::Parser(std::string &str) : str(str) {
   this->num_pipes = 0;
 
   for (std::size_t i = 0; i < str.length(); i++) {
+
+    if (command_counter > MAX_COMMANDS - 1) {
+      this->status = "OVERMAX";
+      break;
+    }
 
     Command *command = &this->tokens[command_counter];
     // For each command
@@ -105,14 +110,6 @@ Parser::Parser(std::string &str) : str(str) {
 
 Parser::~Parser() { delete[] this->tokens; }
 
-const int &Parser::getNumTokens() const { return this->num_tokens; }
-
-const int &Parser::getNumCommands() const { return this->num_commands; }
-
-const int &Parser::getNumPipes() const { return this->num_pipes; }
-
-const Command *const &Parser::getTokens() const { return this->tokens; }
-
 void Parser::history(std::list<std::string> &history, int command_idx) {
 
   Command *command = &this->tokens[command_idx];
@@ -161,7 +158,7 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
     // Replace actual command
     Parser temp_parser(line);
     // Find the new number of commands
-    const int temp_num_commands = temp_parser.getNumCommands();
+    const int &temp_num_commands = temp_parser.getNumCommands();
     int all_num_commands = this->num_commands + temp_num_commands - 1;
 
     if (all_num_commands > MAX_COMMANDS) {
@@ -170,7 +167,7 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
       return;
     }
     // get tokens of commands from history line
-    const Command *temp_tokens = temp_parser.getTokens();
+    const Command *const &temp_tokens = temp_parser.getTokens();
 
     if (all_num_commands > this->num_commands) {
       // temporarily copy commands before realloaction

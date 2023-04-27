@@ -59,6 +59,12 @@ int main() {
     // Parse
     Parser parser(input);
 
+    const std::string &status = parser.getStatus();
+    if (status == "OVERMAX") {
+      std::cout << "Commands must be less than " << MAX_COMMANDS << std::endl;
+      continue;
+    }
+
     const Command *const &tokens = parser.getTokens();
 
     const int &num_tokens = parser.getNumTokens();
