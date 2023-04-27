@@ -59,7 +59,7 @@ int main() {
     // Parse
     Parser parser(input);
 
-    const Command *tokens = parser.getTokens();
+    const Command *const &tokens = parser.getTokens();
 
     const int &num_tokens = parser.getNumTokens();
     const int &num_commands = parser.getNumCommands();

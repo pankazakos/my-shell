@@ -111,7 +111,7 @@ const int &Parser::getNumCommands() const { return this->num_commands; }
 
 const int &Parser::getNumPipes() const { return this->num_pipes; }
 
-const Command *Parser::getTokens() const { return this->tokens; }
+const Command *const &Parser::getTokens() const { return this->tokens; }
 
 void Parser::history(std::list<std::string> &history, int command_idx) {
 
@@ -160,8 +160,56 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
 
     // Replace actual command
     Parser temp_parser(line);
+    // Find the new number of commands
+    const int temp_num_commands = temp_parser.getNumCommands();
+    int all_num_commands = this->num_commands + temp_num_commands - 1;
+
+    if (all_num_commands > MAX_COMMANDS) {
+      std::cout << "Commands must not be more than " << MAX_COMMANDS
+                << std::endl;
+      return;
+    }
+    // get tokens of commands from history line
     const Command *temp_tokens = temp_parser.getTokens();
-    *command = temp_tokens[0]; // deep copy with custom copy constructor
+
+    if (all_num_commands > this->num_commands) {
+      // temporarily copy commands before realloaction
+      Command *old_commands = new Command[this->num_commands];
+      for (int i = 0; i < this->num_commands; i++) {
+        old_commands[i] = this->tokens[i]; // deep copy
+      }
+      // reallocate array of commands
+      delete[] this->tokens;
+      this->tokens = new Command[all_num_commands];
+
+      // deep copy first commands before the replaced
+      int old_cmd_counter = 0;
+      for (int i = 0; i < command_idx; i++) {
+        this->tokens[i] = old_commands[old_cmd_counter];
+        old_cmd_counter++;
+      }
+      // deep copy replaced commands
+      int temp_cmd_counter = 0;
+      int offset = command_idx + temp_num_commands;
+      for (int i = command_idx; i < offset; i++) {
+        this->tokens[i] = temp_tokens[temp_cmd_counter];
+        temp_cmd_counter++;
+      }
+      // deep copy last commands
+      for (int i = offset; i < all_num_commands; i++) {
+        this->tokens[i] = old_commands[old_cmd_counter];
+        old_cmd_counter++;
+      }
+      // deallocate old commands
+      delete[] old_commands;
+      // update data members of Parser
+      this->num_commands = all_num_commands;
+      this->num_pipes = this->num_pipes + temp_parser.getNumPipes();
+      this->num_tokens = this->num_tokens + temp_parser.getNumTokens();
+    } else {
+      // replace the command (only command 0 exists)
+      this->tokens[command_idx] = temp_tokens[0];
+    }
   }
 }
 

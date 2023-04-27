@@ -6,7 +6,7 @@
 #include <map>
 #include <vector>
 
-#define MAX_COMMANDS 4
+#define MAX_COMMANDS 5
 
 // Command struct contains useful information about each command that was parsed
 // from input of mysh
@@ -65,7 +65,7 @@ public:
 
   // Array of MAX_COMMANDS * n dimensions where n is the number of tokens of
   // each command
-  const Command *getTokens() const;
+  const Command *const &getTokens() const;
 
   // prints history when corresponding keyword is given
   // h prints whole history
