@@ -16,7 +16,7 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
   this->num_commands = 0;
   this->num_pipes = 0;
 
-  for (std::size_t i = 0; i < str.length(); i++) {
+  for (size_t i = 0; i < str.length(); i++) {
 
     if (command_counter > MAX_COMMANDS - 1) {
       this->status = "OVERMAX";
@@ -223,7 +223,7 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
       // if alias exists then replace the name of alias with its value
       command->exec = value.at(0);
       // add the rest of the arguments
-      for (std::size_t i = 1; i < value.size(); i++) {
+      for (size_t i = 1; i < value.size(); i++) {
         command->args->push_back(value.at(i));
       }
     }
