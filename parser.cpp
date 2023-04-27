@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include <glob.h>
 #include <iostream>
 #include <limits.h>
 #include <list>
@@ -16,11 +17,11 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
   this->num_commands = 0;
   this->num_pipes = 0;
 
-  for (size_t i = 0; i < str.length(); i++) {
+  for (std::size_t i = 0; i < str.length(); i++) {
 
     if (command_counter > MAX_COMMANDS - 1) {
       this->status = "OVERMAX";
-      break;
+      return;
     }
 
     Command *command = &this->tokens[command_counter];
@@ -30,6 +31,7 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
     int token_counter = 0;
     char prev_delimiter = '0'; // for identifying a token from the left
     while (true) {
+      bool wildcard = false;
       char ch = str[i];
       if ((int)i > 0 && str[i - 1] == ' ' && ch == ' ') {
         if (i == str.length() - 1) {
@@ -52,6 +54,32 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
         if (ch == '&') {
           command->background = true;
         }
+
+        // wild characters * and ?
+        std::size_t pos1 = curr_substr.find('*');
+        std::size_t pos2 = curr_substr.find('?');
+        if (pos1 != std::string::npos || pos2 != std::string::npos) {
+          wildcard = true;
+          glob_t myglob;
+          std::vector<std::string> files;
+
+          // use glob to find the matching files
+          glob(curr_substr.c_str(), 0, NULL, &myglob);
+          for (size_t i = 0; i < myglob.gl_pathc; i++) {
+            files.push_back(std::string(myglob.gl_pathv[i]));
+          }
+          globfree(&myglob);
+
+          // concatenate to arguments
+          command->args->insert(command->args->end(), files.begin(),
+                                files.end());
+
+          // wildcard failed. No matching files
+          if (files.empty()) {
+            wildcard = false;
+          }
+        }
+
         if (token_counter == 0) {
           // ingore whitespace
           if (!curr_substr.empty()) {
@@ -77,7 +105,7 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
             command->args->push_back(std::string(env));
           }
         } else {
-          if (!curr_substr.empty()) {
+          if (!curr_substr.empty() && !wildcard) {
             command->args->push_back(curr_substr);
           }
         }
@@ -223,7 +251,7 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
       // if alias exists then replace the name of alias with its value
       command->exec = value.at(0);
       // add the rest of the arguments
-      for (size_t i = 1; i < value.size(); i++) {
+      for (std::size_t i = 1; i < value.size(); i++) {
         command->args->push_back(value.at(i));
       }
     }
