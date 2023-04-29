@@ -65,7 +65,7 @@ int main() {
       continue;
     }
 
-    Command **&tokens = parser.getTokens();
+    Command **const &tokens = parser.getTokens();
 
     const int &num_tokens = parser.getNumTokens();
     const int &num_commands = parser.getNumCommands();

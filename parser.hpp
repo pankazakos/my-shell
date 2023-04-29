@@ -63,7 +63,7 @@ public:
 
   // Array of MAX_COMMANDS * n dimensions where n is the number of tokens of
   // each command
-  Command **&getTokens() { return tokens; };
+  Command **const &getTokens() const { return tokens; };
 
   // prints history when corresponding keyword is given
   // h prints whole history

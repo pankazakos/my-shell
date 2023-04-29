@@ -209,7 +209,7 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
       return;
     }
     // get tokens of commands from history line
-    Command **&temp_tokens = temp_parser.getTokens();
+    Command **const &temp_tokens = temp_parser.getTokens();
 
     if (all_num_commands > this->num_commands) {
       // temporarily copy commands before realloaction
