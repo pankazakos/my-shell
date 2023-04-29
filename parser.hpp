@@ -63,7 +63,7 @@ public:
 
   // Array of MAX_COMMANDS * n dimensions where n is the number of tokens of
   // each command
-  const Command *const &getTokens() const { return tokens; };
+  Command **&getTokens() { return tokens; };
 
   // prints history when corresponding keyword is given
   // h prints whole history
@@ -85,7 +85,7 @@ private:
   int num_tokens;     // number of total tokens
   int num_commands;   // number of commands
   int num_pipes;      // number of pipes
-  Command *tokens;    // tokens of all commands in one line of the shell prompt
+  Command **tokens;   // tokens of all commands in one line of the shell prompt
 };
 
 #endif

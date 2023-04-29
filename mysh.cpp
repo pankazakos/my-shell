@@ -65,7 +65,7 @@ int main() {
       continue;
     }
 
-    const Command *const &tokens = parser.getTokens();
+    Command **&tokens = parser.getTokens();
 
     const int &num_tokens = parser.getNumTokens();
     const int &num_commands = parser.getNumCommands();
@@ -84,7 +84,7 @@ int main() {
 
     // handle keywords for all commands
     for (int i = 0; i < num_commands; i++) {
-      const Command *command = &tokens[i]; // copy by reference
+      Command *command = tokens[i]; // copy by reference
       if (command->empty)
         continue;
       // exit handle
@@ -110,7 +110,7 @@ int main() {
 
     // Execute commands
     for (int i = 0; i < num_commands; i++) {
-      const Command *command = &tokens[i]; // copy by reference
+      Command *command = tokens[i]; // copy by reference
       if (command->empty)
         continue;
       pid_t pid = fork();

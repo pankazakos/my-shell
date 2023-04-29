@@ -9,13 +9,23 @@
 
 Parser::Parser(std::string &str) : str(str), status("OK") {
 
-  this->num_tokens = 0;
-  this->tokens = new Command[MAX_COMMANDS];
-  int command_counter = 0;
-
-  bool next_pipeIn = false;
   this->num_commands = 0;
+  for (std::size_t i = 0; i < str.length(); i++) {
+    char ch = str[i];
+    if (ch == '|' || ch == ';' || i == str.length() - 1) {
+      this->num_commands++;
+    }
+  }
+
+  this->tokens = new Command *[this->num_commands];
+  for (int i = 0; i < this->num_commands; i++) {
+    this->tokens[i] = new Command();
+  }
+
+  this->num_tokens = 0;
   this->num_pipes = 0;
+  int command_counter = 0;
+  bool next_pipeIn = false;
 
   for (std::size_t i = 0; i < str.length(); i++) {
 
@@ -24,7 +34,7 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
       return;
     }
 
-    Command *command = &this->tokens[command_counter];
+    Command *command = this->tokens[command_counter];
     // For each command
     bool append = false; // bool if there is file to append
     std::string curr_substr = "";
@@ -121,7 +131,6 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
       if (ch == '|' || ch == ';' || i == str.length() - 1) {
         prev_delimiter = ch;
         next_pipeIn = false;
-        this->num_commands++;
         if (ch == '|') {
           next_pipeIn = true;
           this->num_pipes++;
@@ -136,11 +145,16 @@ Parser::Parser(std::string &str) : str(str), status("OK") {
   }
 }
 
-Parser::~Parser() { delete[] this->tokens; }
+Parser::~Parser() {
+  for (int i = 0; i < this->num_commands; i++) {
+    delete this->tokens[i];
+  }
+  delete[] this->tokens;
+}
 
 void Parser::history(std::list<std::string> &history, int command_idx) {
 
-  Command *command = &this->tokens[command_idx];
+  Command *command = this->tokens[command_idx];
 
   std::string first_tok = command->exec;
 
@@ -195,37 +209,47 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
       return;
     }
     // get tokens of commands from history line
-    const Command *const &temp_tokens = temp_parser.getTokens();
+    Command **&temp_tokens = temp_parser.getTokens();
 
     if (all_num_commands > this->num_commands) {
       // temporarily copy commands before realloaction
-      Command *old_commands = new Command[this->num_commands];
+      Command **old_commands = new Command *[this->num_commands];
       for (int i = 0; i < this->num_commands; i++) {
-        old_commands[i] = this->tokens[i]; // deep copy
+        old_commands[i] = new Command();
+        *old_commands[i] = *this->tokens[i]; // deep copy
       }
       // reallocate array of commands
+      for (int i = 0; i < this->num_commands; i++) {
+        delete this->tokens[i];
+      }
       delete[] this->tokens;
-      this->tokens = new Command[all_num_commands];
+      this->tokens = new Command *[all_num_commands];
+      for (int i = 0; i < all_num_commands; i++) {
+        this->tokens[i] = new Command();
+      }
 
       // deep copy first commands before the replaced
       int old_cmd_counter = 0;
       for (int i = 0; i < command_idx; i++) {
-        this->tokens[i] = old_commands[old_cmd_counter];
+        *this->tokens[i] = *old_commands[old_cmd_counter];
         old_cmd_counter++;
       }
       // deep copy replaced commands
       int temp_cmd_counter = 0;
       int offset = command_idx + temp_num_commands;
       for (int i = command_idx; i < offset; i++) {
-        this->tokens[i] = temp_tokens[temp_cmd_counter];
+        *this->tokens[i] = *temp_tokens[temp_cmd_counter];
         temp_cmd_counter++;
       }
       // deep copy last commands
       for (int i = offset; i < all_num_commands; i++) {
-        this->tokens[i] = old_commands[old_cmd_counter];
+        *this->tokens[i] = *old_commands[old_cmd_counter];
         old_cmd_counter++;
       }
       // deallocate old commands
+      for (int i = 0; i < this->num_commands; i++) {
+        delete old_commands[i];
+      }
       delete[] old_commands;
       // update data members of Parser
       this->num_commands = all_num_commands;
@@ -233,7 +257,7 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
       this->num_tokens = this->num_tokens + temp_parser.getNumTokens();
     } else {
       // replace the command (only command 0 exists)
-      this->tokens[command_idx] = temp_tokens[0];
+      *this->tokens[command_idx] = *temp_tokens[0];
     }
   }
 }
@@ -241,7 +265,7 @@ void Parser::history(std::list<std::string> &history, int command_idx) {
 void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
                    int command_idx) {
 
-  Command *command = &this->tokens[command_idx];
+  Command *command = this->tokens[command_idx];
 
   std::string first_tok = command->exec;
 
@@ -287,7 +311,7 @@ void Parser::alias(std::map<std::string, std::vector<std::string>> &aliases,
 
 void Parser::cd(int command_idx) {
 
-  Command *command = &this->tokens[command_idx];
+  Command *command = this->tokens[command_idx];
 
   std::string first_tok = command->exec;
 
