@@ -15,9 +15,14 @@
 
 static bool ignore_sig = true;
 static pid_t child_pid = -1;
+// static pid_t *bg_pids;
 
 void signal_handler(int signal) {
-  if (ignore_sig) {
+  if (signal == SIGCHLD) {
+    // parent receives signal that a child finished
+    int status;
+    waitpid(-1, &status, WNOHANG);
+  } else if (ignore_sig) {
     std::cout << "\nin-mysh-now:> ";
     fflush(stdout);
   } else {
@@ -27,6 +32,7 @@ void signal_handler(int signal) {
 }
 
 int main() {
+
   std::list<std::string> history;
   std::map<std::string, std::vector<std::string>> aliases;
 
@@ -36,13 +42,10 @@ int main() {
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESTART;
 
-  if (sigaction(SIGINT, &sa, NULL) == -1) {
-    std::cerr << "signal handler not registered" << std::endl;
-    return 1;
-  }
-
-  if (sigaction(SIGTSTP, &sa, NULL) == -1) {
-    std::cerr << "signal handler not registered" << std::endl;
+  if (sigaction(SIGINT, &sa, NULL) == -1 ||
+      sigaction(SIGTSTP, &sa, NULL) == -1 ||
+      sigaction(SIGCHLD, &sa, NULL) == -1) {
+    std::cerr << "error: signal handler register" << std::endl;
     return 1;
   }
 
