@@ -107,15 +107,18 @@ int main() {
     }
 
     int pipe_counter = 0;
+    int num_pipepids = 0;
 
     // Execute commands
     for (int i = 0; i < num_commands; i++) {
       Command *command = tokens[i]; // copy by reference
       if (command->empty)
         continue;
+
       pid_t pid = fork();
       ignore_sig = false;
       child_pid = pid;
+
       if (pid < 0) {
         std::cerr << "fork failed: " << std::endl;
         return 1;
@@ -166,17 +169,28 @@ int main() {
       }
       // parent
 
-      if (command->pipeIn) {
-        close(pipe_fd[pipe_counter][0]);
-        close(pipe_fd[pipe_counter][1]);
+      if (command->pipeIn || command->pipeOut) {
+        num_pipepids++; // increment number of proceses of pipeline
+        if (command->pipeIn) {
+          close(pipe_fd[pipe_counter][0]);
+          close(pipe_fd[pipe_counter][1]);
+          pipe_counter++;
+        }
       }
-      if (command->background) {
-        int status;
-        waitpid(child_pid, &status, WNOWAIT);
-      } else {
-        int status;
-        waitpid(child_pid, &status, WUNTRACED);
+      if (!command->background) {
+        if (command->pipeIn && !command->pipeOut) {
+          // gather all commands of current pipeline
+          for (int i = 0; i < num_pipepids; i++) {
+            int status;
+            wait(&status);
+          }
+        } else if (!command->pipeIn && !command->pipeOut) {
+          // commands that do not belong to a pipeline
+          int status;
+          waitpid(child_pid, &status, WUNTRACED);
+        }
       }
+
       ignore_sig = true;
     }
   }

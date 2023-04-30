@@ -16,10 +16,10 @@ struct Command {
   std::string fileIn;             // input file
   std::string fileOut;            // output file
   std::string fileApnd;           // append to file
-  bool pipeOut;                   // redirect stdout to pipe write
-  bool pipeIn;                    // redirect stdin to pipe read
-  bool background;                // command should run in background
-  bool empty; // false if command exists and is not a keyword
+  bool pipeOut;    // left from pipe: redirect stdout to pipe write
+  bool pipeIn;     // right from pipe: redirect stdin to pipe read
+  bool background; // command should run in background
+  bool empty;      // false if command exists and is not a keyword
 
   Command()
       : args(new std::vector<std::string>), pipeOut(false), pipeIn(false),
