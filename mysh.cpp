@@ -15,7 +15,6 @@
 
 static bool ignore_sig = true;
 static pid_t child_pid = -1;
-// static pid_t *bg_pids;
 
 void signal_handler(int signal) {
   if (signal == SIGCHLD) {
