@@ -89,10 +89,6 @@ int main() {
       Command *command = tokens[i]; // copy by reference
       if (command->empty)
         continue;
-      // exit handle
-      if (command->exec == "exit") {
-        return 0;
-      }
       // history handle
       parser.history(history, i);
       // createalias and destroyalias
@@ -114,6 +110,10 @@ int main() {
     // Execute commands
     for (int i = 0; i < num_commands; i++) {
       Command *command = tokens[i]; // copy by reference
+      // exit handle
+      if (command->exec == "exit") {
+        return 0;
+      }
       if (command->empty)
         continue;
 
