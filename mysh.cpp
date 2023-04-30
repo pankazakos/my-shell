@@ -177,14 +177,14 @@ int main() {
           pipe_counter++;
         }
       }
-      if (!command->background) {
-        if (command->pipeIn && !command->pipeOut) {
+      if (!command->background && !command->pipeOut) {
+        if (command->pipeIn) {
           // gather all commands of current pipeline
           for (int i = 0; i < num_pipepids; i++) {
             int status;
             wait(&status);
           }
-        } else if (!command->pipeIn && !command->pipeOut) {
+        } else {
           // commands that do not belong to a pipeline
           int status;
           waitpid(child_pid, &status, WUNTRACED);
