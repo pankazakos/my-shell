@@ -142,26 +142,26 @@ int main() {
             open(command->fileOut.c_str(), O_WRONLY | O_TRUNC | O_CREAT, 0644);
         int fdApnd = open(command->fileApnd.c_str(),
                           O_WRONLY | O_CREAT | O_APPEND, 0644);
-        dup2(fdInput, 0);
-        dup2(fdOutput, 1);
-        dup2(fdApnd, 1);
         if (!command->fileIn.empty()) {
+          dup2(fdInput, STDIN_FILENO);
           close(fdInput);
         }
         if (!command->fileOut.empty()) {
+          dup2(fdOutput, STDOUT_FILENO);
           close(fdOutput);
         }
         if (!command->fileApnd.empty()) {
+          dup2(fdApnd, STDOUT_FILENO);
           close(fdApnd);
         }
         if (command->pipeIn) {
-          dup2(pipe_fd[pipe_counter][0], 0);
+          dup2(pipe_fd[pipe_counter][0], STDIN_FILENO);
           close(pipe_fd[pipe_counter][0]);
           close(pipe_fd[pipe_counter][1]);
           pipe_counter++;
         }
         if (command->pipeOut) {
-          dup2(pipe_fd[pipe_counter][1], 1);
+          dup2(pipe_fd[pipe_counter][1], STDOUT_FILENO);
           close(pipe_fd[pipe_counter][0]);
           close(pipe_fd[pipe_counter][1]);
         }
