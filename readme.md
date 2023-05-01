@@ -53,5 +53,40 @@ in-mysh-now:> ll
 ll is not a command
 in-mysh-now:> sleep 30 &        ; ls    | grep Makefile
 Makefile
-in-mysh-now:> 
+in-mysh-now:> echo first line > new.txt ; ls | grep Makefile | cat >> new.txt ; cat new.txt ; myHistory 2
+sort<num.txt>sorted.txt; ls|grep sorted.txt ;cat sorted.txt
+first line
+Makefile
+sorted.txt
+1 
+2
+3 
+4 
+5 
+
+
+// other tests
+wget https://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/tsv/locus_types/gene_with_protein_product.txt
+cat gene_with_protein_product.txt
+cut -f2 gene_with_protein_product.txt > gene_with_protein_product_names_only_v1.txt
+cat gene_with_protein_product_names_only_v1.txt
+cat gene_with_protein_product.txt | cut -f2 > gene_with_protein_product_names_only_v2.txt
+diff gene_with_protein_product_names_only_v1.txt gene_with_protein_product_names_only_v2.txt
+(return nothing)
+
+shuf gene_with_protein_product_names_only_v1.txt > gene_with_protein_product_names_only_v1_shuffled.txt
+sort < gene_with_protein_product_names_only_v1_shuffled.txt > gene_with_protein_product_names_only_v1_sorted.txt
+head -100 gene_with_protein_product_names_only_v1.txt >h100.txt
+tail -50 gene_with_protein_product_names_only_v1.txt >t50.txt
+cat h100.txt t50.txt >ht150_v1.txt
+wc -l ht150_v1.txt
+(return 150)
+
+cat h100.txt> ht150_v2.txt
+cat t50.txt >> ht150_v2.txt
+diff ht150_v1.txt ht150_v2.txt
+(return nothing)
+
+ls gene*
+ls h*1?0.txt
 ```
