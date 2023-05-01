@@ -6,7 +6,7 @@
 #include <map>
 #include <vector>
 
-#define MAX_COMMANDS 5
+#define MAX_COMMANDS 30
 
 // Command struct contains useful information about each command that was parsed
 // from input of mysh
