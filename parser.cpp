@@ -330,13 +330,6 @@ void Parser::cd(int command_idx) {
     return;
   }
 
-  // get current working directory
-  char cwd[PATH_MAX];
-  if (getcwd(cwd, sizeof(cwd)) == NULL) {
-    std::cerr << "getcwd() error" << std::endl;
-    return;
-  }
-
   // change to new directory
   std::string dir = command->args->at(1);
   chdir(dir.c_str());
